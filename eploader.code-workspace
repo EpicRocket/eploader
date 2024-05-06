@@ -1,0 +1,47 @@
+{
+    "folders": [
+        {
+            "path": "./"
+        },
+    ],
+
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "build ncuploader",
+                "type": "shell",
+                "command": "go build -o ${workspaceFolder}/output/",
+                "problemMatcher": [
+                    "$go",
+                ],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "args": [
+                ],
+                "group": "build",
+                "options": {
+                    "cwd": "${workspaceFolder}/ncuploader"
+                }
+            }
+        ]
+    },
+
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "run ncuploader",
+                "type": "go",
+                "request": "launch",
+                "mode": "auto",
+                "program": "${workspaceFolder}/ncuploader",
+                "env": {},
+                "args": [],
+                "preLaunchTask": "build ncuploader"
+            }
+        ],
+        "compounds": []
+    },
+}
