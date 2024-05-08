@@ -4,6 +4,4 @@ SecretKey:
 EndPoint: https://kr.object.ncloudstorage.com
 Bucket: epicrocket
 ObjectRoot:
-UploadPaths:
-ExcludeTags:
-InlcudeExt:
+DownloadPath:

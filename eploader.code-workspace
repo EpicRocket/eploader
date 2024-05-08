@@ -24,6 +24,23 @@
                 "options": {
                     "cwd": "${workspaceFolder}/ncuploader"
                 }
+            },
+            {
+                "label": "build ncdownloader",
+                "type": "shell",
+                "command": "go build -o ${workspaceFolder}/output/",
+                "problemMatcher": [
+                    "$go",
+                ],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "args": [
+                ],
+                "group": "build",
+                "options": {
+                    "cwd": "${workspaceFolder}/ncdownloader"
+                }
             }
         ]
     },
@@ -40,6 +57,16 @@
                 "env": {},
                 "args": [],
                 "preLaunchTask": "build ncuploader"
+            },
+            {
+                "name": "run ncdownloader",
+                "type": "go",
+                "request": "launch",
+                "mode": "auto",
+                "program": "${workspaceFolder}/ncdownloader",
+                "env": {},
+                "args": [],
+                "preLaunchTask": "build ncdownloader"
             }
         ],
         "compounds": []

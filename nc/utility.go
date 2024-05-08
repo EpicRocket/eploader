@@ -1,7 +1,9 @@
 ﻿package nc
 
 import (
+	"crypto/md5"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -36,4 +38,19 @@ func ExtractPath(fullPath, rootKeyword string) string {
 		return ""
 	}
 	return fullPath[startPos:]
+}
+
+func GetFileMD5Hash(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hasher := md5.New()
+	if _, err := io.Copy(hasher, file); err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }

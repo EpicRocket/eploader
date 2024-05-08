@@ -63,19 +63,18 @@ func NewClient(region, accessKeyID, secretKey, ep, bucket, objectRoot string) *C
 	}
 }
 
-func (c *Client) GetObjects() map[string]string {
-	result, err := c.ListObjectsV2(&s3.ListObjectsV2Input{
+func (c *Client) GetObjects() (*s3.ListObjectsV2Output, error) {
+	input := &s3.ListObjectsV2Input{
 		Bucket: aws.String(c.bucket),
-	})
-	if err != nil {
-		return nil
+		Prefix: aws.String(c.objectRoot),
 	}
 
-	s3Objects := make(map[string]string)
-	for _, obj := range result.Contents {
-		s3Objects[*obj.Key] = *obj.ETag
+	resp, err := c.ListObjectsV2(input)
+	if err != nil {
+		return nil, err
 	}
-	return s3Objects
+
+	return resp, nil
 }
 
 func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {
@@ -109,4 +108,45 @@ func (c *Client) UploadObjects(requests []*FileRequest) {
 			println(err.Error())
 		}
 	}
+}
+
+func (c *Client) UploadDeleteObject(key string) error {
+	input := &s3.DeleteObjectInput{
+		Bucket: aws.String(c.bucket),
+		Key:    aws.String(key),
+	}
+
+	_, err := c.DeleteObject(input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) DownloadFile(key, output string) error {
+	outFile, err := os.OpenFile(output, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+
+	// S3에서 파일 스트림 다운로드
+	input := &s3.GetObjectInput{
+		Bucket: aws.String(c.bucket),
+		Key:    aws.String(key),
+	}
+
+	resp, err := c.GetObject(input)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// 로컬 파일로 복사
+	if _, err := outFile.ReadFrom(resp.Body); err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	return nil
 }
