@@ -18,6 +18,7 @@ type Config struct {
 	EndPoint     string   `yaml:"EndPoint,omitempty"`
 	Bucket       string   `yaml:"Bucket,omitempty"`
 	ObjectRoot   string   `yaml:"ObjectRoot,omitempty"`
+	UploadRoot   string   `yaml:"UploadRoot,omitempty"`
 	UploadPaths  []string `yaml:"UploadPaths,omitempty"`
 	ExcludeTags  []string `yaml:"ExcludeTags,omitempty"`
 }
@@ -47,6 +48,7 @@ func main() {
 		config.EndPoint,
 		config.Bucket,
 		config.ObjectRoot,
+		config.UploadRoot,
 	)
 
 	if client == nil {
@@ -100,35 +102,6 @@ func main() {
 
 				localFiles[relPath] = struct{}{}
 
-				// C:/Temp로 복사
-				// relPath2, err := filepath.Rel("D:/UnrealEngine", path)
-				// if err != nil {
-				// 	return err
-				// }
-
-				// destPath := filepath.Join("C:/Temp", relPath2)
-				// if err := os.MkdirAll(filepath.Dir(destPath), os.ModePerm); err != nil {
-				// 	return err
-				// }
-
-				// srcFile, err := os.Open(path)
-				// if err != nil {
-				// 	return err
-				// }
-
-				// defer srcFile.Close()
-
-				// destFile, err := os.Create(destPath)
-				// if err != nil {
-				// 	return err
-				// }
-
-				// defer destFile.Close()
-
-				// if _, err := io.Copy(destFile, srcFile); err != nil {
-				// 	return err
-				// }
-
 				// 로컬 파일 해시 계산
 				localFileHash, err := nc.GetFileMD5Hash(path)
 				if err != nil {
@@ -181,9 +154,9 @@ func main() {
 		return
 	}
 
-	if len(requests) > 0 {
-		client.UploadObjects(requests)
-	}
+	// if len(requests) > 0 {
+	// 	client.UploadObjects(requests)
+	// }
 
 	fmt.Println("Upload complete")
 }

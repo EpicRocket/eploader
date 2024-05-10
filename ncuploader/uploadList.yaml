@@ -2,8 +2,9 @@
 AccessKeyID:
 SecretKey:
 EndPoint: https://kr.object.ncloudstorage.com
-Bucket: epicrocket
+Bucket: 
 ObjectRoot:
+UploadRoot:
 UploadPaths:
 ExcludeTags:
 InlcudeExt:

@@ -1,8 +1,8 @@
 ﻿package nc
 
 import (
-	"errors"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -38,9 +38,10 @@ type Client struct {
 	ep         string
 	bucket     string
 	objectRoot string
+	uploadRoot string
 }
 
-func NewClient(region, accessKeyID, secretKey, ep, bucket, objectRoot string) *Client {
+func NewClient(region, accessKeyID, secretKey, ep, bucket, objectRoot, uploadRoot string) *Client {
 	creds := credentials.NewStaticCredentials(accessKeyID, secretKey, "")
 
 	sess, err := session.NewSession(&aws.Config{
@@ -60,6 +61,7 @@ func NewClient(region, accessKeyID, secretKey, ep, bucket, objectRoot string) *C
 		ep:         ep,
 		bucket:     bucket,
 		objectRoot: objectRoot,
+		uploadRoot: uploadRoot,
 	}
 }
 
@@ -83,10 +85,10 @@ func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {
 		return nil, err
 	}
 
-	s3Key := ExtractPath(filePath, c.objectRoot)
-	if s3Key == "" {
+	s3Key, err := filepath.Rel(filePath, c.uploadRoot)
+	if err != nil {
 		file.Close()
-		return nil, errors.New("invalid file path")
+		return nil, err
 	}
 	s3Key = strings.Replace(s3Key, "\\", "/", -1)
 
