@@ -154,9 +154,9 @@ func main() {
 		return
 	}
 
-	// if len(requests) > 0 {
-	// 	client.UploadObjects(requests)
-	// }
+	if len(requests) > 0 {
+		client.UploadObjects(requests)
+	}
 
 	fmt.Println("Upload complete")
 }

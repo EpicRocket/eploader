@@ -85,11 +85,12 @@ func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {
 		return nil, err
 	}
 
-	s3Key, err := filepath.Rel(filePath, c.uploadRoot)
+	s3Key, err := filepath.Rel(c.uploadRoot, filePath)
 	if err != nil {
 		file.Close()
 		return nil, err
 	}
+	s3Key = filepath.Join(c.objectRoot, s3Key)
 	s3Key = strings.Replace(s3Key, "\\", "/", -1)
 
 	println("Upload Request:", s3Key)
