@@ -14,12 +14,14 @@ import (
 
 type FileRequest struct {
 	file *os.File
+	key  string
 	*request.Request
 }
 
-func NewFileRequest(file *os.File, req *request.Request) *FileRequest {
+func NewFileRequest(file *os.File, key string, req *request.Request) *FileRequest {
 	return &FileRequest{
 		file:    file,
+		key:     key,
 		Request: req,
 	}
 }
@@ -93,8 +95,6 @@ func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {
 	s3Key = filepath.Join(c.objectRoot, s3Key)
 	s3Key = strings.Replace(s3Key, "\\", "/", -1)
 
-	println("Upload Request:", s3Key)
-
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(s3Key),
@@ -102,14 +102,17 @@ func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {
 	}
 
 	req, _ := c.PutObjectRequest(input)
-	return NewFileRequest(file, req), nil
+	return NewFileRequest(file, s3Key, req), nil
 }
 
 func (c *Client) UploadObjects(requests []*FileRequest) {
 	for _, req := range requests {
 		if err := req.Send(); err != nil {
 			println(err.Error())
+		} else {
+			println("Uploaded: ", req.key)
 		}
+		req.file.Close()
 	}
 }
 
