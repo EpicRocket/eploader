@@ -64,12 +64,18 @@ func main() {
 	for _, resp := range s3Objects {
 		for _, i := range resp.Contents {
 			prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot)
+			if prefixKey[0] == '/' {
+				prefixKey = prefixKey[1:]
+			}
 			s3ObjectMap[prefixKey] = i
 		}
 	}
 
 	for _, i := range s3ObjectMap {
 		prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot)
+		if prefixKey[0] == '/' {
+			prefixKey = prefixKey[1:]
+		}
 
 		outputPath := filepath.Join(config.DownloadPath, prefixKey)
 

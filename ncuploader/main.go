@@ -64,7 +64,11 @@ func main() {
 	s3ObjectMap := make(map[string]*s3.Object)
 	for _, resp := range s3Objects {
 		for _, i := range resp.Contents {
-			s3ObjectMap[*i.Key] = i
+			prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot)
+			if prefixKey[0] == '/' {
+				prefixKey = prefixKey[1:]
+			}
+			s3ObjectMap[prefixKey] = i
 		}
 	}
 
@@ -89,7 +93,8 @@ func main() {
 					return err
 				}
 
-				relPath, err := filepath.Rel(p, path)
+				relPath, err := filepath.Rel(config.UploadRoot, path)
+				relPath = strings.Replace(relPath, "\\", "/", -1)
 				if err != nil {
 					return err
 				}
