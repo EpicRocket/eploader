@@ -67,18 +67,30 @@ func NewClient(region, accessKeyID, secretKey, ep, bucket, objectRoot, uploadRoo
 	}
 }
 
-func (c *Client) GetObjects() (*s3.ListObjectsV2Output, error) {
+func (c *Client) GetObjects() ([]*s3.ListObjectsV2Output, error) {
 	input := &s3.ListObjectsV2Input{
 		Bucket: aws.String(c.bucket),
 		Prefix: aws.String(c.objectRoot),
 	}
 
-	resp, err := c.ListObjectsV2(input)
-	if err != nil {
-		return nil, err
+	result := []*s3.ListObjectsV2Output{}
+
+	for {
+		resp, err := c.ListObjectsV2(input)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, resp)
+
+		if resp.IsTruncated != nil && *resp.IsTruncated {
+			input.ContinuationToken = resp.NextContinuationToken
+		} else {
+			break
+		}
 	}
 
-	return resp, nil
+	return result, nil
 }
 
 func (c *Client) GetUploadObjects(filePath string) (*FileRequest, error) {

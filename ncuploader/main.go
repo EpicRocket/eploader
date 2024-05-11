@@ -62,8 +62,10 @@ func main() {
 
 	// S3 객체를 맵에 저장하여 빠르게 접근 가능하게 함
 	s3ObjectMap := make(map[string]*s3.Object)
-	for _, item := range s3Objects.Contents {
-		s3ObjectMap[*item.Key] = item
+	for _, resp := range s3Objects {
+		for _, i := range resp.Contents {
+			s3ObjectMap[*i.Key] = i
+		}
 	}
 
 	requests := make([]*nc.FileRequest, 0, 1000)
@@ -134,7 +136,7 @@ func main() {
 	}
 
 	// 존재하지 않는 S3 객체 삭제
-	for key, _ := range s3ObjectMap {
+	for key := range s3ObjectMap {
 		if _, exists := localFiles[key]; !exists {
 			err := client.UploadDeleteObject(key)
 			if err != nil {

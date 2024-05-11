@@ -46,6 +46,7 @@ func main() {
 		config.EndPoint,
 		config.Bucket,
 		config.ObjectRoot,
+		config.DownloadPath,
 	)
 
 	if client == nil {
@@ -59,12 +60,15 @@ func main() {
 
 	// S3 객체를 맵에 저장하여 빠르게 접근 가능하게 함
 	s3ObjectMap := make(map[string]*s3.Object)
-	for _, i := range s3Objects.Contents {
-		prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot+"/")
-		s3ObjectMap[prefixKey] = i
+
+	for _, resp := range s3Objects {
+		for _, i := range resp.Contents {
+			prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot)
+			s3ObjectMap[prefixKey] = i
+		}
 	}
 
-	for _, i := range s3Objects.Contents {
+	for _, i := range s3ObjectMap {
 		prefixKey := strings.TrimPrefix(*i.Key, config.ObjectRoot)
 
 		outputPath := filepath.Join(config.DownloadPath, prefixKey)
