@@ -39,6 +39,12 @@ func main() {
 		panic(err)
 	}
 
+	// config.DownloadPath 검증
+	if _, err := os.Stat(config.DownloadPath); os.IsNotExist(err) {
+		// 없다면 실행 위치로 변경
+		config.DownloadPath, err = os.Getwd()
+	}
+
 	client := nc.NewClient(
 		config.Region,
 		config.AccessKeyID,

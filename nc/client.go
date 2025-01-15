@@ -1,6 +1,8 @@
 ﻿package nc
 
 import (
+	"bufio"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -143,12 +145,12 @@ func (c *Client) UploadDeleteObject(key string) error {
 }
 
 func (c *Client) DownloadFile(key, output string) error {
-	outFile, err := os.OpenFile(output, os.O_CREATE|os.O_RDWR, 0644)
+	outFile, err := os.Create(output)
 	if err != nil {
 		return err
 	}
+	defer outFile.Close()
 
-	// S3에서 파일 스트림 다운로드
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(key),
@@ -160,11 +162,11 @@ func (c *Client) DownloadFile(key, output string) error {
 	}
 	defer resp.Body.Close()
 
-	// 로컬 파일로 복사
-	if _, err := outFile.ReadFrom(resp.Body); err != nil {
+	// 버퍼를 사용한 파일 쓰기
+	writer := bufio.NewWriter(outFile)
+	if _, err := io.Copy(writer, resp.Body); err != nil {
 		return err
 	}
-	defer outFile.Close()
 
-	return nil
+	return writer.Flush()
 }
